@@ -1,0 +1,78 @@
+package views 
+
+import "fmt"
+
+
+func getIconClass(classes []string) string {
+    if len(classes) > 0 {
+        return "icon " + classes[0]
+    }
+    return "icon"
+}
+
+
+templ Icon(name string, class ...string) {
+
+    <div class="grid place-items-center"> 
+
+        <svg class={ getIconClass(class) } xmlns="http://www.w3.org/2000/svg">
+            <use href={ fmt.Sprintf("/public/images/icons.svg#%s", name) }></use>
+        </svg>
+
+    </div>
+}
+
+
+
+
+templ pageTitle(title string) {
+    <title>v3:cwlp/m 𑁋 {title}</title>
+}
+
+
+
+
+templ oobSelection() {
+    <template>
+        <div id="topbar-selection" hx-swap-oob="true" class="justify-self-center text-white font-bold">
+            { children... }
+        </div>
+    </template>
+}
+
+
+
+
+
+
+
+
+
+templ GenericIndicator(indicator string) {
+    <span>{indicator}</span>
+}
+
+
+
+
+
+templ StudioIndicator(iconHash string, name string, discordId string) {
+    <div class="flex flex-row gap-2 items-center">
+
+        <img src={fmt.Sprintf("https://cdn.discordapp.com/icons/%s/%s.webp", discordId, iconHash)} alt="Family" class="w-icon rounded-sm">
+        <span class="">{name}</span>
+
+    </div>
+}
+
+
+
+
+
+
+
+templ OobDelPlaceholder(id string) {
+    <template>
+        <div id={id} hx-swap-oob="delete"></div>
+    </template>
+}

@@ -1,0 +1,16 @@
+package views
+
+import "cwl/types"
+
+templ AccountField(acc types.Account) {
+    <div id={ "acc-" + acc.Tag } class="flex flex-col bg-gray-100 hover:cursor-pointer" 
+        hx-delete={"/accounts/" + acc.Tag}
+        hx-trigger="click"
+        hx-swap="outerHTML"
+        hx-target="closest div"
+    >
+        <span>#{ acc.Tag }</span>
+        <span>{ acc.Name }</span>
+        <span>{ acc.Townhall }</span>
+    </div>
+}

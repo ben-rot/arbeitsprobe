@@ -1,0 +1,52 @@
+package views
+
+
+
+templ SocialButton(iconName string) {
+    <a 
+        class="hover:cursor-pointer flex flex-row gap-2 place-items-center text-unfocused hover:text-white group"
+        href="https://discord.gg/e7wc8tQBK9" target="_blank"
+    >
+
+        @Icon(iconName, "w-4 stroke-none fill-current")
+
+        // <span class="text-xs leading-none text-center uppercase">Join</span>
+    </a>
+}
+
+
+
+
+templ module(text string) {
+    <div class="flex justify-center grow items-center bg-yellow-200 rounded-lg">
+        {text}
+    </div>
+}
+
+
+
+
+//hxTarget string, hxGet string == via { templ.Attributes... }
+templ homeButton(text string, attrs templ.Attributes) {
+
+    <div class="p-layout">
+
+        <div { attrs... }
+            class={
+                "flex flex-row justify-center gap-2 flex-1 py-layout border-main border-cards_border rounded-sm bg-cards_bg hover:cursor-pointer",
+                templ.KV("text-red-500 hover:text-white hover:bg-red-500", text == "Logout"),
+                templ.KV("hover:border-cards_border_hover", text != "Logout"),
+            }
+        >
+
+            if text == "Logout" {
+                @Icon("logout", "w-4 fill-current stroke-1 rotate-180")
+            } else {
+                @Icon("arrow-up-right", "w-4 stroke-2")
+            }
+            
+            <span>{text}</span>
+
+        </div>
+    </div>
+}
