@@ -1,0 +1,315 @@
+package views
+
+import (
+    "cwl/types"
+	"fmt"
+)
+
+templ AddAccountModal() {
+    // Add close button + Headline
+    <div class="p-layout border-cards_border border-main rounded-sm bg-cards_bg z-[9999999]">
+        <form 
+
+            class="grid grid-cols-[auto_1fr_auto] gap-x-1 gap-y-2 grid-flow-row p-layout"
+
+            hx-post="/accounts/add"
+            hx-swap="beforeend"
+            hx-target="#account-list"
+            hx-trigger="submit"
+
+        
+            x-data="{
+                tag: '92QV89V9R',
+                tagRegex: /^[CGJLPQRUVY023456789]{8,10}$/i,
+                showTagErr: false,
+
+                token: '12345678',
+                tokenRegex: /^[a-zA-Z0-9]{8}$/,
+                showTokenErr: false,
+
+
+
+                get isTagValid() { return this.tagRegex.test(this.tag); },
+                get isTokenValid() { return this.tokenRegex.test(this.token); },
+
+                get isSubmitable() { return this.isTagValid && this.isTokenValid; },
+
+
+
+                get tagState() {
+                    if (this.tag.length === 0) return 'idle';
+                    if (this.isTagValid) return 'valid';
+                    if (this.showTagErr) return 'error';
+                    return 'idle';
+                },
+
+                get tokenState() {
+                    if (this.token.length === 0) return 'idle';
+                    if (this.isTokenValid) return 'valid';
+                    if (this.showTokenErr) return 'error';
+                    return 'idle';
+                },
+
+
+                reset() {
+                    this.tag = ''; this.showTagErr = false;
+                    this.token = ''; this.showTokenErr = false;
+                    closeModal();
+                }
+            }"
+            
+            @clear-form.window="reset()"
+        >
+
+
+
+
+
+
+            <div class="col-span-2 flex flex-row gap-1 bg-cards_bg border-main border border-cards_border rounded-sm p-1 text-xs">
+
+                <span class="text-gray-400">#</span>
+                <input 
+                    class="focus:outline-none placeholder:uppercase placeholder:font-light placeholder:text-xxs placeholder:text-unfocused text-white"
+                    type="text" 
+                    name="account_tag"
+                    id="account_tag" 
+                    placeholder="Account Tag"
+
+                    x-model="tag"
+                    x-ref="focusTarget" 
+
+                    @input="tag = tag.toUpperCase().replace(/#/g, ''); showTagErr = false;"
+                    @input.debounce.500ms="showTagErr = !isTagValid && tag.length > 0"
+
+                    @keydown="$event.key === '#' && $event.preventDefault()"
+                    @paste="if ($event.clipboardData.getData('text').includes('#')) {
+                        $event.preventDefault();
+                        tag = $event.clipboardData.getData('text').replace(/#/g, '');
+                    }"
+                >
+            </div>
+
+            
+            <div class="border-main border-cards_border rounded-sm bg-cards_bg hover:border-cards_border_hover aspect-square hover:cursor-pointer group/icon"> 
+
+                <template x-if="tagState === 'idle'">
+                    @Icon("ellipsis", "h-4/7 w-auto stroke-2 fill-none text-white")
+                </template>
+
+                <template x-if="tagState === 'valid'">
+                    @Icon("tick", "h-4/7 w-auto stroke-none fill-current text-green-400")
+                </template>
+
+                <template x-if="tagState === 'error'">
+                    @Icon("cross", "h-4/7 w-auto stroke-none fill-current text-red-400")
+                </template>
+                
+            </div>
+            
+
+
+
+
+
+                
+
+            <div class="col-span-2 bg-cards_bg border-main border border-cards_border rounded-sm p-1 text-xs">
+                <input 
+                    class="focus:outline-none placeholder:uppercase placeholder:font-light placeholder:text-xxs placeholder:text-unfocused text-white"
+                    type="text" 
+                    name="api_token" 
+                    id="api_token" 
+                    x-model="token"
+                    placeholder="API Token"
+
+                    @input="showTokenErr = false;"
+                    @input.debounce.500ms="showTokenErr = !isTokenValid && token.length > 0"
+                >
+            </div>
+
+
+            <div class="border-main border-cards_border rounded-sm bg-cards_bg hover:border-cards_border_hover aspect-square hover:cursor-pointer group/icon"> 
+
+                <template x-if="tokenState === 'idle'">
+                    @Icon("ellipsis", "h-4/7 w-auto stroke-2 fill-none text-white")
+                </template>
+
+                <template x-if="tokenState === 'valid'">
+                    @Icon("tick", "h-4/7 w-auto stroke-none fill-current text-green-400")
+                </template>
+
+                <template x-if="tokenState === 'error'">
+                    @Icon("cross", "h-4/7 w-auto stroke-none fill-current text-red-400")
+                </template>
+                
+            </div>
+            
+
+
+
+
+
+
+
+            <div class="border-main border-cards_border rounded-sm bg-cards_bg hover:border-cards_border_hover aspect-square hover:cursor-pointer group/icon">
+                @Icon("help", "h-4/7 w-auto stroke-none fill-current text-unfocused group-hover/icon:text-white")
+            </div>
+
+            <button 
+                type="submit"
+                class="col-span-2 rounded-sm p-1 bg-cards_bg border-main border border-cards_border text-xxs uppercase"
+                :class="isSubmitable ? 'text-white border-green-400' : 'text-unfocused cursor-not-allowed'"
+                :disabled="!isSubmitable"
+            >
+                Submit
+            </button>
+
+        </form>
+
+    </div>
+}
+
+
+
+
+
+
+
+
+
+
+// On click --> change border color. Inherited from accoount list wrapper (x-data=selected:null)
+
+
+templ AccountCard(data types.Account) {
+
+    <div class="grid grid-cols-[auto_1fr_auto] grid-rows-[repeat(2, min-content)] gap-x-2 gap-y-1 bg-cards_bg px-2 py-2 rounded-sm border-1 border-cards_border group hover:border-cards_border_hover">
+
+        <img src={fmt.Sprintf("/public/images/townhalls/%d.webp", data.Townhall)} alt="Townhall" class="h-0 min-h-full object-contain row-span-3">
+
+        <span class="col-start-2 text-nowrap truncate leading-none text-xs font-medium">{data.Name}</span>
+        <span class="col-start-2 text-unfocused text-nowrap truncate leading-none text-xxs font-medium">#{data.Tag}</span>
+
+        <div class="hover:bg-cards_border hover:cursor-pointer text-unfocused hover:text-white rounded-sm aspect-square hidden group-hover:grid place-items-center row-start-1 col-start-3 row-span-2">
+            @Icon("arrow-up-right", "w-3 stroke-2")
+        </div>
+
+    </div>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+templ homeAccountCard(num int, data *types.DashboardAccount) {
+
+    {{
+        var pos string
+        if num < 10 { pos = fmt.Sprintf("0%d", num) } else { pos = fmt.Sprintf("%d", num) }
+
+        townhall := fmt.Sprintf("/public/images/townhalls/%d.webp", data.Townhall)
+    }}
+
+    <div class="grid grid-cols-[auto_35%_1fr] grid-rows-[min-content_min-content_min-content] bg-cards_bg border-main border-cards_border hover:border-cards_border_hover rounded-sm p-2 gap-x-4 gap-y-1 hover:cursor-pointer">
+
+        <div class="text-[9.5px] text-unfocused leading-none grid place-items-start">{pos}</div>
+    
+        <img src={townhall} alt="Townhall" class="h-10 aspect-square row-start-2 row-span-2 self-end">
+
+        <span class="text-xxs text-unfocused leading-none col-start-2">#{data.Tag}</span>
+        <span class="leading-none text-base font-medium col-start-2 row-start-2 self-start">{data.Name}</span>
+        
+        <span class="text-xxs text-unfocused leading-none mt-auto row-start-3 col-start-2">Champ 3</span>
+
+        
+
+        <div class="grid grid-cols-[auto_1fr] grid-rows-[repeat(2, min-content)] col-start-3 row-span-full border-l-main border-cards_border pl-4 gap-y-2 gap-x-2">
+
+            if data.FamilyName != nil {
+
+                <span class="text-xxs leading-none col-span-full">{"@"} Resistance</span> 
+
+
+                if data.ClanTag != nil {
+
+                    <img src="/public/images/leagues/champ1.png" alt="League" class="h-0 min-h-full object-contain">
+
+                    <div class="flex flex-col col-start-2 row-start-2">
+                        <span class="text-sm leading-none">clanwartroopers</span>
+                        <span class="text-xs leading-none text-unfocused mt-auto">#123456</span>
+                    </div> 
+                } else {
+                    <span class="text-unfocused text-xxs row-span-full col-span-full items-center">not assigned yet</span>
+                }
+
+            } else {
+                <span class="grid place-items-center text-unfocused text-xxs row-span-full col-span-full">Not Registered</span>
+            }
+                
+        </div>
+    
+    </div>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+templ addAccBtn(count int) {
+
+    <button
+        type="button" 
+        class="absolute bottom-layout right-layout p-layout flex flex-row items-center gap-2 bg-cards_bg border-main border-cards_border rounded-sm" 
+
+        x-data
+        @click="$store.modals.open('account', 'accounts/add-form')"
+
+        if count >= 5 {
+            disabled
+        }
+    >
+
+        if count < 5 {
+            @Icon("plus", "h-4 w-auto stroke-2 fill-none")
+        }
+
+        <span class="text-xxs text-unfocused">{count}/5</span>
+
+    </button>
+}
+
+templ AddAccBtnOob(count int) {
+    <div id="add-acc-btn" hx-swap-oob="outerHTML">
+        @addAccBtn(count)
+    </div>
+}
