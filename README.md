@@ -17,6 +17,7 @@ Kleines angefangenes Projekt
 
 
 ## Status des Projektes
+- Keinerlei Dokumentation
 - Fertige UI ohne Responsiveness
 - SQL Schemas und vereinzelte Queries
 - Routes & Handlers für vereinzelte API-Endpoints (überwiegend Page-Routing)
